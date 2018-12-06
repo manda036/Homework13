@@ -11,7 +11,16 @@ function buildMetadata(sample) {
 
 function buildCharts(sample) {
   d3.json(`samples/${sample}`).then(function (response) {
-    console.log(response);
+    // console.log(response);
+    // var finalData = [];
+    // response.sample_values.forEach((data, i) => {
+    //   var dataRearranged = {
+    //     id: response.otu_ids[i],
+    //     labels: response.otu_labels[i],
+    //     values: data};
+    //   finalData.push(dataRearranged);
+    // });
+    // console.log(finalData);
     var sample_ids = response.otu_ids;
     var sample_values = response.sample_values;
     var sample_labels = response.otu_labels;
@@ -21,24 +30,24 @@ function buildCharts(sample) {
       mode: "markers",
       marker: {
         size: response.sample_values,
-        color: response.sample_ids
-      }
+        color: sample_ids
+      },
+      text: sample_labels
     };
     Plotly.newPlot("bubble", [trace]);
     
-    const sorted = sample_values.sort();
-    const sliced = sorted.slice(0, 10);
+    var slicedValues = sample_values.slice(0, 10);
+    var slicedLabels = sample_labels.slice(0, 10);
+    var slicedIds = sample_ids.slice(0, 10);
     var pie_data = {
-    values: sliced,
-    labels: sample_labels,
+    values: slicedValues,
+    labels: slicedIds,
+    text: slicedLabels,
     type: "pie"
   };
     var layout = {
-      showlegend: true,
-      legend: {
-        xanchor: "right"
+      showlegend: true
       }
-    }
   Plotly.newPlot("pie", [pie_data], layout);
 });
 }
@@ -55,10 +64,10 @@ function init() {
         .append("option")
         .text(sample)
         .property("value", sample);
-        const firstSample = sampleNames[0];
-        buildCharts(firstSample);
-        buildMetadata(firstSample);
       });
+    const firstSample = sampleNames[0];
+    buildCharts(firstSample);
+    buildMetadata(firstSample);
     });
   }
 // Use the first sample from the list to build the initial plots
